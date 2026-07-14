@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>给BB joi的邀请函 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-a:#FFF0F1;
+    --bg-b:#FFE9D6;
+    --pink:#FF6FA5;
+    --pink-deep:#E24D85;
+    --mint:#57D8AE;
+    --mint-deep:#2FAE8A;
+    --yellow:#FFD166;
+    --plum:#5C3358;
+    --plum-soft:#8A6386;
+    --card:#FFFDF8;
+    --shadow:rgba(180,90,130,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Quicksand',sans-serif;
+    color:var(--plum);
+    background:linear-gradient(160deg,var(--bg-a),var(--bg-b));
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Baloo 2',cursive;margin:0;}
+  button{font-family:'Quicksand',sans-serif;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+  /* ---------- floating ambient bits ---------- */
+  .floaters{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+  .floater{position:absolute;font-size:22px;opacity:.55;animation:drift 9s ease-in-out infinite;}
+  @keyframes drift{
+    0%,100%{transform:translateY(0) rotate(-4deg);}
+    50%{transform:translateY(-26px) rotate(6deg);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .floater{animation:none;}
+  }
+
+  /* ---------- envelope screen ---------- */
+  #envelope-screen{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    background:linear-gradient(160deg,var(--bg-a),var(--bg-b));
+    transition:opacity .6s ease;
+  }
+  #envelope-screen.hidden{opacity:0;pointer-events:none;}
+  .envelope{
+    position:relative;width:min(78vw,260px);height:min(78vw,260px)*0.62;
+    aspect-ratio:5/3.1;
+    cursor:pointer;
+  }
+  .env-body{
+    position:absolute;inset:0;
+    background:var(--card);
+    border-radius:14px;
+    box-shadow:0 18px 40px var(--shadow);
+    border:2px solid #FFD9E4;
+  }
+  .env-flap{
+    position:absolute;top:-2px;left:-2px;right:-2px;height:58%;
+    background:var(--pink);
+    clip-path:polygon(0 0,100% 0,50% 92%);
+    border-radius:14px 14px 0 0;
+    transform-origin:top center;
+    transition:transform .7s cubic-bezier(.34,1.56,.64,1);
+    z-index:3;
+  }
+  .env-seal{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-30%);
+    width:52px;height:52px;border-radius:50%;
+    background:var(--pink-deep);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;color:#fff;z-index:4;
+    box-shadow:0 6px 14px rgba(200,60,110,.35);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:translate(-50%,-30%) scale(1);}50%{transform:translate(-50%,-30%) scale(1.08);}}
+  .envelope.opening .env-flap{transform:rotateX(180deg);}
+  .envelope.opening .env-seal{opacity:0;transition:opacity .25s ease;}
+  .env-hint{margin-top:26px;font-size:15px;color:var(--plum-soft);font-weight:600;}
+
+  /* ---------- main content ---------- */
+  #main-content{
+    position:relative;z-index:2;
+    max-width:640px;margin:0 auto;padding:56px 20px 80px;
+    opacity:0;transform:translateY(14px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  #main-content.show{opacity:1;transform:translateY(0);}
+
+  section{margin-bottom:52px;}
+  .eyebrow{
+    display:inline-block;font-size:13px;font-weight:700;color:var(--mint-deep);
+    background:#E3FBF3;padding:5px 14px;border-radius:999px;margin-bottom:14px;
+  }
+  .hero h1{font-size:clamp(28px,7vw,40px);line-height:1.25;color:var(--plum);}
+  .hero h1 .accent{color:var(--pink-deep);}
+  .hero p{font-size:16px;line-height:1.8;color:var(--plum-soft);margin-top:14px;}
+
+  .card{
+    background:var(--card);border-radius:20px;padding:26px 22px;
+    box-shadow:0 10px 30px var(--shadow);border:1px solid #FFE3EC;
+  }
+
+  /* countdown */
+  .count-title{font-size:15px;font-weight:700;color:var(--plum-soft);margin-bottom:16px;}
+  .count-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .count-cell{background:#FFF6EE;border-radius:14px;padding:14px 6px;text-align:center;}
+  .count-num{font-family:'Baloo 2',cursive;font-size:clamp(22px,6vw,30px);font-weight:800;color:var(--pink-deep);line-height:1;}
+  .count-label{font-size:12px;color:var(--plum-soft);margin-top:6px;font-weight:600;}
+
+  /* menu flip cards */
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .flip-card{perspective:1000px;height:130px;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;cursor:pointer;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-front,.flip-back{
+    position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;backface-visibility:hidden;padding:10px;text-align:center;
+  }
+  .flip-front{background:#FFF6EE;border:1px dashed #FFC98F;}
+  .flip-front .fe{font-size:30px;}
+  .flip-front .fq{font-size:13px;color:var(--plum-soft);margin-top:6px;font-weight:600;}
+  .flip-back{background:var(--mint);color:#04342C;transform:rotateY(180deg);}
+  .flip-back .fname{font-weight:700;font-size:15px;}
+  .flip-back .fdesc{font-size:12px;margin-top:6px;opacity:.85;line-height:1.5;}
+
+  /* food options */
+  .food-options{display:flex;flex-direction:column;gap:10px;}
+  .food-btn{
+    width:100%;text-align:left;background:#FFF6EE;border:2px solid transparent;
+    border-radius:14px;padding:14px 16px;font-size:15px;font-weight:600;color:var(--plum);
+    cursor:pointer;transition:border-color .15s ease, transform .15s ease;
+    display:flex;align-items:center;gap:10px;
+  }
+  .food-btn .fb-emoji{font-size:20px;}
+  .food-btn:hover{border-color:var(--pink);transform:translateX(3px);}
+  .food-btn:focus-visible{outline:3px solid var(--mint-deep);outline-offset:2px;}
+
+  /* rsvp */
+  .rsvp-wrap{position:relative;padding:30px 10px;min-height:150px;}
+  .rsvp-title{text-align:center;font-size:18px;font-weight:700;margin-bottom:22px;}
+  .rsvp-buttons{display:flex;justify-content:center;gap:16px;position:relative;flex-wrap:wrap;}
+  .btn{
+    border:none;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;
+    cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:focus-visible{outline:3px solid var(--mint-deep);outline-offset:3px;}
+  .btn-yes{background:var(--pink);color:#fff;box-shadow:0 10px 22px rgba(255,111,165,.4);}
+  .btn-yes:hover{background:var(--pink-deep);transform:translateY(-2px);}
+  .btn-no{
+    background:#fff;color:var(--plum-soft);border:2px solid #F0DDE6;
+    position:relative;
+  }
+  .hidden{display:none;}
+  #success-panel{display:none;text-align:center;}
+  #success-panel.show{display:block;}
+
+  /* date picker */
+  .date-picker-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .date-input{
+    font-family:'Quicksand',sans-serif;font-size:16px;font-weight:600;color:var(--plum);
+    background:#FFF6EE;border:2px solid #FFD9E4;border-radius:14px;
+    padding:12px 16px;width:100%;max-width:280px;
+  }
+  .date-input:focus-visible{outline:3px solid var(--mint-deep);outline-offset:2px;}
+  .date-hint{font-size:13px;color:var(--plum-soft);margin:0;font-weight:600;}
+  #success-panel h2{color:var(--pink-deep);font-size:24px;margin-bottom:12px;}
+  #success-panel p{color:var(--plum-soft);font-size:15px;line-height:1.9;}
+  .detail-row{display:flex;justify-content:center;gap:8px;font-size:14px;margin-top:4px;}
+
+  footer{text-align:center;font-size:13px;color:var(--plum-soft);opacity:.7;}
+</style>
+</head>
+<body>
+
+<div class="floaters" aria-hidden="true" id="floaters"></div>
+
+<div id="envelope-screen">
+  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="点击拆开信封查看邀请函">
+    <div class="env-body"></div>
+    <div class="env-flap"></div>
+    <div class="env-seal">♡</div>
+  </div>
+  <p class="env-hint">戳一下拆开信封呀 👆</p>
+</div>
+
+<main id="main-content">
+
+  <section class="hero">
+    <span class="eyebrow">给BB joi的小邀请</span>
+    <h1>找个你有空的日子，<br>陪我去吃顿<span class="accent">好吃的</span>好不好？</h1>
+    <p>不用化很久的妆，不用准备礼物，只要人来就好。我已经把细节都想好啦，你负责好好被我宠一晚上 🥹</p>
+  </section>
+
+  <section>
+    <div class="card rsvp-wrap">
+
+      <div id="step-ask">
+        <p class="rsvp-title" id="rsvp-title">那...你愿意来吗？</p>
+        <div class="rsvp-buttons" id="rsvp-buttons">
+          <button class="btn btn-yes" id="btn-yes">去！💕</button>
+          <button class="btn btn-no" id="btn-no" style="position:relative;">让我想想 🤔</button>
+        </div>
+      </div>
+
+      <div id="step-time" class="hidden">
+        <p class="rsvp-title">好耶！那你想约什么时候呀？</p>
+        <div class="date-picker-wrap">
+          <input type="datetime-local" id="date-input" class="date-input" aria-label="选择约会日期和时间">
+          <button class="btn btn-yes" id="btn-confirm-time" type="button">就这个时间啦 💕</button>
+          <p class="date-hint" id="date-hint">选好之后点一下确认呀</p>
+        </div>
+      </div>
+
+      <div id="step-food" class="hidden">
+        <p class="rsvp-title">那你想吃什么呀？</p>
+        <div class="food-options" id="food-options"></div>
+      </div>
+
+      <div id="success-panel">
+        <h2>耶！那就说定啦 🎉</h2>
+        <p>
+          <span class="detail-row">📅 <span id="detail-date"></span></span><br>
+          <span class="detail-row">🍽️ <span id="detail-food"></span></span>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="countdown-section" class="hidden">
+    <div class="card">
+      <p class="count-title">距离约会还有</p>
+      <div class="count-grid">
+        <div class="count-cell"><div class="count-num" id="cd-days">--</div><div class="count-label">天</div></div>
+        <div class="count-cell"><div class="count-num" id="cd-hours">--</div><div class="count-label">时</div></div>
+        <div class="count-cell"><div class="count-num" id="cd-mins">--</div><div class="count-label">分</div></div>
+        <div class="count-cell"><div class="count-num" id="cd-secs">--</div><div class="count-label">秒</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">甜品彩蛋</span>
+    <h2 style="font-size:20px;margin-top:10px;margin-bottom:16px;">戳一戳，偷看饭后甜品 🍰</h2>
+    <div class="menu-grid" id="menu-grid"></div>
+  </section>
+
+  <footer>做给BB joi的一个小网页 · 记得穿得暖暖的 🤍</footer>
+</main>
+
+<script>
+  const CONFIG = {
+    girlfriendName: "BB joi",
+    menu: [
+      {emoji:"🍲", name:"火锅", desc:"辣度按你喜欢的来"},
+      {emoji:"🍜", name:"螺蛳粉", desc:"闻着臭吃着香，敢不敢试"},
+      {emoji:"🥩", name:"牛排", desc:"几分熟你说了算"},
+      {emoji:"🍗", name:"KFC", desc:"想偷懒的话这个最快"}
+    ],
+    dessertMenu: [
+      {emoji:"🍮", name:"提拉米苏", desc:"饭后甜一下"},
+      {emoji:"🍡", name:"芋圆芋泥", desc:"软软糯糯，一定要试"},
+      {emoji:"🥣", name:"芋泥汤水", desc:"暖暖甜甜的收尾"},
+      {emoji:"🍧", name:"杨枝甘露", desc:"清爽解腻"}
+    ],
+    dodgeLines: ["诶不要走呀","再想想嘛～","真的不考虑一下我吗","别跑啦别跑啦","直接答应我不好嘛 🥺","好啦别逃了啦"]
+  };
+
+  // ambient floaters
+  (function(){
+    const emojis = ["💗","✨","🍰","🌸"];
+    const wrap = document.getElementById("floaters");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce) return;
+    for(let i=0;i<6;i++){
+      const el = document.createElement("span");
+      el.className="floater";
+      el.textContent = emojis[i % emojis.length];
+      el.style.left = (8 + Math.random()*84) + "vw";
+      el.style.top = (6 + Math.random()*80) + "vh";
+      el.style.animationDelay = (Math.random()*4) + "s";
+      el.style.fontSize = (18 + Math.random()*14) + "px";
+      wrap.appendChild(el);
+    }
+  })();
+
+  // envelope open
+  function openEnvelope(){
+    const env = document.getElementById("envelope");
+    const screen = document.getElementById("envelope-screen");
+    const main = document.getElementById("main-content");
+    if(env.classList.contains("opening")) return;
+    env.classList.add("opening");
+    setTimeout(()=>{
+      screen.classList.add("hidden");
+      main.classList.add("show");
+    }, 550);
+  }
+  const envEl = document.getElementById("envelope");
+  envEl.addEventListener("click", openEnvelope);
+  envEl.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" ") openEnvelope(); });
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    // still require a click, but skip the flap flip visual delay
+  }
+
+  // countdown (started once a time is picked)
+  let countdownTimer = null;
+  function startCountdown(iso){
+    if(countdownTimer) clearInterval(countdownTimer);
+    const target = new Date(iso).getTime();
+    function tick(){
+      const now = Date.now();
+      let diff = Math.max(0, target - now);
+      const d = Math.floor(diff/86400000); diff -= d*86400000;
+      const h = Math.floor(diff/3600000); diff -= h*3600000;
+      const m = Math.floor(diff/60000); diff -= m*60000;
+      const s = Math.floor(diff/1000);
+      document.getElementById("cd-days").textContent = d;
+      document.getElementById("cd-hours").textContent = String(h).padStart(2,"0");
+      document.getElementById("cd-mins").textContent = String(m).padStart(2,"0");
+      document.getElementById("cd-secs").textContent = String(s).padStart(2,"0");
+    }
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
+
+  // menu flip cards
+  (function(){
+    const grid = document.getElementById("menu-grid");
+    CONFIG.dessertMenu.forEach((item)=>{
+      const card = document.createElement("div");
+      card.className = "flip-card";
+      card.setAttribute("role","button");
+      card.setAttribute("tabindex","0");
+      card.setAttribute("aria-label", "翻开查看甜品：" + item.name);
+      card.innerHTML = `
+        <div class="flip-inner">
+          <div class="flip-front"><div class="fe">${item.emoji}</div><div class="fq">戳我看看？</div></div>
+          <div class="flip-back"><div class="fname">${item.emoji} ${item.name}</div><div class="fdesc">${item.desc}</div></div>
+        </div>`;
+      function toggle(){ card.classList.toggle("flipped"); }
+      card.addEventListener("click", toggle);
+      card.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" ") toggle(); });
+      grid.appendChild(card);
+    });
+  })();
+
+  // dodging "let me think" button
+  (function(){
+    const wrap = document.getElementById("rsvp-buttons");
+    const noBtn = document.getElementById("btn-no");
+    const title = document.getElementById("rsvp-title");
+    let dodges = 0;
+    function dodge(){
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const wrapRect = wrap.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const maxX = Math.max(0, wrapRect.width - btnRect.width);
+      const maxY = Math.max(0, 60);
+      const x = Math.random()*maxX - maxX/2;
+      const y = reduce ? 0 : (Math.random()*maxY - maxY/2);
+      noBtn.style.position = "relative";
+      noBtn.style.transform = "translate(" + x + "px," + y + "px)";
+      title.textContent = CONFIG.dodgeLines[dodges % CONFIG.dodgeLines.length];
+      dodges++;
+    }
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); dodge(); }, {passive:false});
+    noBtn.addEventListener("focus", dodge);
+  })();
+
+  // step 1: yes -> reveal step 2 (pick a time)
+  (function(){
+    document.getElementById("btn-yes").addEventListener("click", ()=>{
+      document.getElementById("step-ask").classList.add("hidden");
+      document.getElementById("step-time").classList.remove("hidden");
+      confettiBurst();
+    });
+  })();
+
+  // step 2: set up the date/time picker (no lower bound so she can pick any date)
+  (function(){
+    const input = document.getElementById("date-input");
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    input.min = now.toISOString().slice(0,16);
+    const defaultDate = new Date(now.getTime() + 5*86400000);
+    input.value = defaultDate.toISOString().slice(0,16);
+
+    document.getElementById("btn-confirm-time").addEventListener("click", ()=>{
+      if(!input.value){
+        document.getElementById("date-hint").textContent = "先选一个日期时间嘛 🥺";
+        return;
+      }
+      const chosen = new Date(input.value);
+      chooseTime({ label: formatDateLabel(chosen), iso: chosen.toISOString() });
+    });
+  })();
+
+  function formatDateLabel(d){
+    const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
+    const month = d.getMonth()+1;
+    const date = d.getDate();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return month + "月" + date + "日 " + weekdays[d.getDay()] + " " + hh + ":" + mm;
+  }
+
+  // step 3: time chosen -> reveal step 4 (pick food)
+  function chooseTime(opt){
+    document.getElementById("step-time").classList.add("hidden");
+    document.getElementById("step-food").classList.remove("hidden");
+    window._chosenDateOpt = opt;
+    confettiBurst();
+  }
+
+  // step 4: build food option buttons
+  (function(){
+    const wrap = document.getElementById("food-options");
+    CONFIG.menu.forEach((item)=>{
+      const btn = document.createElement("button");
+      btn.className = "food-btn";
+      btn.type = "button";
+      btn.innerHTML = '<span class="fb-emoji">' + item.emoji + '</span><span>' + item.name + '</span>';
+      btn.addEventListener("click", ()=> chooseFood(item));
+      wrap.appendChild(btn);
+    });
+  })();
+
+  // step 5: food chosen -> success + countdown
+  function chooseFood(item){
+    document.getElementById("step-food").classList.add("hidden");
+    const panel = document.getElementById("success-panel");
+    panel.classList.add("show");
+    document.getElementById("detail-date").textContent = window._chosenDateOpt.label;
+    document.getElementById("detail-food").textContent = item.emoji + " " + item.name;
+    document.getElementById("countdown-section").classList.remove("hidden");
+    startCountdown(window._chosenDateOpt.iso);
+    confettiBurst();
+  }
+
+  function confettiBurst(){
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const colors = ["#FF6FA5","#FFD166","#57D8AE","#FFB6C1"];
+    const count = reduce ? 12 : 40;
+    for(let i=0;i<count;i++){
+      const p = document.createElement("div");
+      p.style.position="fixed";
+      p.style.left = (45+Math.random()*10) + "vw";
+      p.style.top = "40vh";
+      p.style.width = "8px"; p.style.height="8px";
+      p.style.background = colors[i % colors.length];
+      p.style.borderRadius = Math.random()>0.5 ? "50%" : "2px";
+      p.style.zIndex = 70;
+      p.style.pointerEvents = "none";
+      p.style.transition = "transform 1.2s cubic-bezier(.2,.6,.4,1), opacity 1.2s ease-out";
+      document.body.appendChild(p);
+      const angle = Math.random()*Math.PI*2;
+      const dist = 80 + Math.random()*220;
+      const dx = Math.cos(angle)*dist;
+      const dy = Math.sin(angle)*dist - 60;
+      requestAnimationFrame(()=>{
+        p.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + (Math.random()*360) + "deg)";
+        p.style.opacity = "0";
+      });
+      setTimeout(()=>p.remove(), 1300);
+    }
+  }
+</script>
+</body>
+</html>
