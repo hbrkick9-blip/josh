@@ -106,6 +106,21 @@
   .hero h1{font-size:clamp(28px,7vw,40px);line-height:1.25;color:var(--plum);}
   .hero h1 .accent{color:var(--pink-deep);}
   .hero p{font-size:16px;line-height:1.8;color:var(--plum-soft);margin-top:14px;}
+  .hero-mascots{display:flex;gap:16px;margin-top:18px;font-size:36px;align-items:center;}
+  .hero-mascots>*{display:inline-block;animation:bounce-soft 2.6s ease-in-out infinite;}
+  .hero-mascots>*:nth-child(2){animation-delay:.2s;}
+  .hero-mascots>*:nth-child(3){animation-delay:.4s;}
+  .mascot-photo{
+    width:64px;height:64px;border-radius:50%;object-fit:cover;
+    border:3px solid #fff;box-shadow:0 6px 14px var(--shadow);
+  }
+  @keyframes bounce-soft{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-mascots>*{animation:none;}
+  }
 
   .card{
     background:var(--card);border-radius:20px;padding:26px 22px;
@@ -146,6 +161,10 @@
   .food-btn .fb-emoji{font-size:20px;}
   .food-btn:hover{border-color:var(--pink);transform:translateX(3px);}
   .food-btn:focus-visible{outline:3px solid var(--mint-deep);outline-offset:2px;}
+  .custom-food-row{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    margin-top:20px;padding-top:18px;border-top:1px dashed #FFD9E4;
+  }
 
   /* rsvp */
   .rsvp-wrap{position:relative;padding:30px 10px;min-height:150px;}
@@ -190,17 +209,23 @@
   <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="点击拆开信封查看邀请函">
     <div class="env-body"></div>
     <div class="env-flap"></div>
-    <div class="env-seal">♡</div>
+    <div class="env-seal">🐾</div>
   </div>
-  <p class="env-hint">戳一下拆开信封呀 👆</p>
+  <p class="env-hint">戳一下拆开信封呀 🐾</p>
 </div>
 
 <main id="main-content">
 
   <section class="hero">
-    <span class="eyebrow">给BB joi的小邀请</span>
-    <h1>找个你有空的日子，<br>陪我去吃顿<span class="accent">好吃的</span>好不好？</h1>
-    <p>不用化很久的妆，不用准备礼物，只要人来就好。我已经把细节都想好啦，你负责好好被我宠一晚上 🥹</p>
+    <span class="eyebrow">🍁 加拿大之旅 · 给BB joi的小邀请</span>
+    <h1>在加拿大的这段日子里，<br>陪我去吃顿<span class="accent">好吃的</span>好不好？</h1>
+    <p>不用化很久的妆，不用准备礼物，只要人来就好。异国他乡也要把你宠得妥妥的，细节我都想好啦 🥹</p>
+    <div class="hero-mascots" aria-hidden="true">
+      <img class="mascot-photo" src="https://images.unsplash.com/photo-1562176566-e9afd27531d4?fm=jpg&q=60&w=200&auto=format&fit=crop" alt="">
+      <span>🍁</span>
+      <img class="mascot-photo" src="https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=200&auto=format&fit=crop" alt="">
+      <span>🐱</span>
+    </div>
   </section>
 
   <section>
@@ -226,6 +251,11 @@
       <div id="step-food" class="hidden">
         <p class="rsvp-title">那你想吃什么呀？</p>
         <div class="food-options" id="food-options"></div>
+        <div class="custom-food-row">
+          <p class="date-hint">都不想吃？自己打字告诉我</p>
+          <input type="text" id="custom-food-input" class="date-input" placeholder="想吃点别的..." maxlength="20">
+          <button class="btn btn-yes" id="btn-custom-food" type="button">就这个 💕</button>
+        </div>
       </div>
 
       <div id="success-panel">
@@ -257,7 +287,7 @@
     <div class="menu-grid" id="menu-grid"></div>
   </section>
 
-  <footer>做给BB joi的一个小网页 · 记得穿得暖暖的 🤍</footer>
+  <footer>做给BB joi的一个小网页 · 在加拿大也要好好宠你 🐾🍁</footer>
 </main>
 
 <script>
@@ -280,7 +310,7 @@
 
   // ambient floaters
   (function(){
-    const emojis = ["💗","✨","🍰","🌸"];
+    const emojis = ["🐶","🐱","🍁","🐾"];
     const wrap = document.getElementById("floaters");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(reduce) return;
@@ -436,6 +466,19 @@
       btn.innerHTML = '<span class="fb-emoji">' + item.emoji + '</span><span>' + item.name + '</span>';
       btn.addEventListener("click", ()=> chooseFood(item));
       wrap.appendChild(btn);
+    });
+  })();
+
+  // step 4b: custom food input
+  (function(){
+    const input = document.getElementById("custom-food-input");
+    document.getElementById("btn-custom-food").addEventListener("click", ()=>{
+      const val = input.value.trim();
+      if(!val){
+        input.focus();
+        return;
+      }
+      chooseFood({ emoji:"🍽️", name: val });
     });
   })();
 
